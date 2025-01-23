@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:80" # Frontend disponible en el puerto 3001
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000/api # URL del backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
