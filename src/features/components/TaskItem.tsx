@@ -26,7 +26,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onDelete, onEdit }) => {
           {task.completed ? 'Completada' : 'Pendiente'}
         </span>
       </td>
-      <td className="px-6 py-4 text-right text-sm font-medium">
+      <td className="px-6 py-4 text-sm text-gray-500">{task.tags}</td>
+      <td className="px-6 py-4 text-left text-sm font-medium">
         <button
           onClick={handleEditClick}
           className="text-indigo-600 hover:text-indigo-900 mr-2"
