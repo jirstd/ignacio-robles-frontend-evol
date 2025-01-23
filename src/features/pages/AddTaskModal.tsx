@@ -4,11 +4,10 @@ import * as Yup from 'yup';
 import Modal from '../../components/Modal';
 import { Task } from '../tasks/tasks';
 
-interface EditTaskModalProps {
-  task: Task;
+interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updates: Partial<Task>) => void;
+  onSubmit: (task: Omit<Task, 'id' | 'createdAt'>) => void;
 }
 
 const programmingLanguages = [
@@ -27,13 +26,14 @@ const programmingLanguages = [
   'Dart',
 ];
 
-const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, onSubmit }) => {
+const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onSubmit }) => {
+
   const formik = useFormik({
     initialValues: {
-      title: task.title || '',
-      description: task.description || '',
-      completed: task.completed || false,
-      tags: task.tags || [],
+      title: '',
+      description: '',
+      completed: false,
+      tags: [] as string[],
     },
     validationSchema: Yup.object({
       title: Yup.string()
@@ -44,7 +44,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
       tags: Yup.array().of(Yup.string()),
     }),
     onSubmit: (values) => {
+        console.log('values -->', values);
       onSubmit(values);
+      formik.resetForm();
       onClose();
     },
   });
@@ -65,7 +67,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <form onSubmit={formik.handleSubmit} className="p-6">
-        <h2 className="text-lg font-bold mb-4 text-gray-900">Editar Tarea</h2>
+        <h2 className="text-lg font-bold mb-4">Agregar Nueva Tarea</h2>
 
         {/* Campo: Título */}
         <div className="mb-4">
@@ -79,8 +81,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 ${
-              formik.touched.title && formik.errors.title ? 'border-red-500' : 'border-gray-300'
-            } text-gray-900`}
+                formik.touched.title && formik.errors.title ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900`}
           />
           {formik.touched.title && formik.errors.title && (
             <p className="text-red-500 text-sm mt-1">{formik.errors.title}</p>
@@ -98,10 +100,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 ${
-              formik.touched.description && formik.errors.description
-                ? 'border-red-500'
-                : 'border-gray-300'
-            } text-gray-900`}
+                formik.touched.description && formik.errors.description
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              } text-gray-900`}
           ></textarea>
           {formik.touched.description && formik.errors.description && (
             <p className="text-red-500 text-sm mt-1">{formik.errors.description}</p>
@@ -130,7 +132,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
           <select
             onChange={(e) => addTag(e.target.value)}
             value=""
-            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 border-gray-300 text-gray-900"
+            className="border p-2 rounded w-full focus:ring-2 border-gray-300"
           >
             <option value="" disabled>
               Seleccionar Lenguaje
@@ -172,4 +174,4 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, on
   );
 };
 
-export default EditTaskModal;
+export default AddTaskModal;
