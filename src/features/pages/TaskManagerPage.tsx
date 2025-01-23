@@ -11,7 +11,7 @@ import AddTaskModal from './AddTaskModal'; '../pages/AddTaskModal';
 const TaskManagerPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, loading, error } = useSelector((state: RootState) => state.tasks);
-
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>(tasks);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
@@ -19,6 +19,25 @@ const TaskManagerPage: React.FC = () => {
   useEffect(() => {
     dispatch(fetchTasks()); // Cargar tareas al montar el componente
   }, [dispatch, tasks]);
+
+  const handleFilter = (filters: { searchText?: string; status?: string }) => {
+    const { searchText = '', status = '' } = filters;
+
+    const lowerCaseSearch = searchText.toLowerCase();
+
+    const filtered = tasks.filter((task) => {
+      const matchesText =
+        task.title.toLowerCase().includes(lowerCaseSearch) ||
+        task.description.toLowerCase().includes(lowerCaseSearch);
+
+      const matchesStatus =
+        status === '' || (status === 'completed' && task.completed) || (status === 'pending' && !task.completed);
+
+      return matchesText && matchesStatus;
+    });
+
+    setFilteredTasks(filtered);
+  };
 
   const handleAddTask = (newTask: Omit<Task, 'id' | 'createdAt'>) => {
     dispatch(addTask(newTask)); // Crear nueva tarea
@@ -62,10 +81,10 @@ const TaskManagerPage: React.FC = () => {
             Agregar Tarea
           </button>
         </div>
-        <TaskFilters onFilter={() => {}} />
+        <TaskFilters onFilter={handleFilter} />
         <div className="overflow-auto max-h-[65%]">
           <TaskList
-            tasks={tasks}
+            tasks={filteredTasks}
             onDeleteTask={handleDeleteTask}
             onEditTask={openEditModal}
           />
