@@ -17,27 +17,42 @@ const TaskManagerPage: React.FC = () => {
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
   useEffect(() => {
+    // Sincroniza `filteredTasks` con las tareas al cargar
+    if (tasks.length > 0) {
+      setFilteredTasks(tasks);
+    }
+  }, [tasks]);
+
+  useEffect(() => {
     dispatch(fetchTasks()); // Cargar tareas al montar el componente
   }, [dispatch, tasks]);
 
   const handleFilter = (filters: { searchText?: string; status?: string }) => {
     const { searchText = '', status = '' } = filters;
-
+  
     const lowerCaseSearch = searchText.toLowerCase();
-
+  
+    // Si no hay filtros activos, muestra todas las tareas
+    if (!searchText && !status) {
+      setFilteredTasks(tasks);
+      return;
+    }
+  
+    // Filtrar por texto y estado
     const filtered = tasks.filter((task) => {
       const matchesText =
         task.title.toLowerCase().includes(lowerCaseSearch) ||
         task.description.toLowerCase().includes(lowerCaseSearch);
-
+  
       const matchesStatus =
         status === '' || (status === 'completed' && task.completed) || (status === 'pending' && !task.completed);
-
+  
       return matchesText && matchesStatus;
     });
-
+  
     setFilteredTasks(filtered);
   };
+  
 
   const handleAddTask = (newTask: Omit<Task, 'id' | 'createdAt'>) => {
     dispatch(addTask(newTask)); // Crear nueva tarea
@@ -68,6 +83,8 @@ const TaskManagerPage: React.FC = () => {
   const closeAddModal = () => {
     setAddModalOpen(false);
   };
+
+  console.log('filteredTasks -->', filteredTasks);
 
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-100">

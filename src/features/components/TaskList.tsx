@@ -9,7 +9,8 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onDeleteTask, onEditTask }) => {
-  if (tasks.length === 0) {
+  console.log('tasks in list -->', tasks);
+  if (tasks.length === 0 || !tasks) {
     return <p className="text-center text-gray-500">No hay tareas disponibles.</p>;
   }
 
